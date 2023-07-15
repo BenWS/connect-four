@@ -5,7 +5,7 @@ REF: Game Recreation - 'Connect Four'
 '''
 TODO: T_2023_07_15 - Game Skeleton
 
-- [ ] Create working game skeleton (i.e. game that displays a static image)
+- [x] Create working game skeleton (i.e. game that displays a static image)
 '''
 
 '''
@@ -13,12 +13,17 @@ TODO: 2023_07_15_2 - Click Events
 
 Click events.
 
-- [ ] Enable game runtime to:
-	- [ ] Detect click events
-	- [ ] Detect click release
-	- [ ] Detect click down (without release)
-	- [ ] Detect that click down event is occurring on static sprite
+- [x] Enable game runtime to:
+	- [x] Detect click events
+	- [x] Detect click release
+	- [x] Detect click down (without release)
+	- [x] Detect that click down event is occurring on static sprite
+	- [x] Return no result if click and hold is occurring any where else besides sprite
 - [ ] Discover how the event registry or related might be used to drag a sprite
+
+References:
+	- https://www.geeksforgeeks.org/how-to-move-an-image-with-the-mouse-in-pygame/
+	- https://stackoverflow.com/a/59009852
 '''
 
 '''
@@ -33,16 +38,7 @@ the user released such to a slot position
 
 import pygame
 
-from pygame.locals import (
-	RLEACCEL,
-	K_UP,
-	K_DOWN,
-	K_LEFT,
-	K_RIGHT,
-	K_ESCAPE,
-	KEYDOWN,
-	QUIT,
-)
+from pygame.locals import *
 
 # Initialize Pygame
 pygame.init()
@@ -70,6 +66,12 @@ while running:
 		for event in pygame.event.get():
 				if event.type == pygame.QUIT:
 						running = False
+				elif event.type == MOUSEBUTTONDOWN:	
+					if token.rect.collidepoint(event.pos):
+							print('Mouse Button Down')
+				elif event.type == MOUSEBUTTONUP:	
+					if token.rect.collidepoint(event.pos):
+							print('Mouse Button Up')
 
 		# Clear the screen
 		screen.fill((0, 0, 0))
