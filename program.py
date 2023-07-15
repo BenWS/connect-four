@@ -9,7 +9,7 @@ TODO: T_2023_07_15 - Game Skeleton
 '''
 
 '''
-TODO:
+TODO: 2023_07_15_2 - Click Events
 
 Click events.
 
@@ -53,13 +53,15 @@ screen = pygame.display.set_mode((width, height))
 
 class Token(pygame.sprite.Sprite):
 	def __init__(self):
-		self.surf = pygame.Surface((10,10))
+		self.surf = pygame.Surface((30,30))
 		self.surf.fill((255,0,0))
 		self.surf.set_colorkey((255,255,255),RLEACCEL)
 		self.rect = self.surf.get_rect()
 
 # create token object 
 token = Token()
+token.rect.top = 50
+token.rect.right = 50
 
 # Game loop
 running = True
@@ -74,7 +76,6 @@ while running:
 
 		# Update the game state
 		screen.blit(token.surf,token.rect)
-		token.rect.right = token.rect.right + 1
 
 		# Draw the game elements
 		# TODO: Add your drawing code here
