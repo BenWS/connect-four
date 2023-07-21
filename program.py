@@ -3,30 +3,6 @@ REF: Game Recreation - 'Connect Four'
 '''
 
 '''
-TODO: T_2023_07_15 - Game Skeleton
-
-- [x] Create working game skeleton (i.e. game that displays a static image)
-'''
-
-'''
-TODO: 2023_07_15_2 - Click Events
-
-Click events.
-
-- [x] Enable game runtime to:
-	- [x] Detect click events
-	- [x] Detect click release
-	- [x] Detect click down (without release)
-	- [x] Detect that click down event is occurring on static sprite
-	- [x] Return no result if click and hold is occurring any where else besides sprite
-- [ ] Discover how the event registry or related might be used to drag a sprite
-
-References:
-	- https://www.geeksforgeeks.org/how-to-move-an-image-with-the-mouse-in-pygame/
-	- https://stackoverflow.com/a/59009852
-'''
-
-'''
 TODO:
 - [ ] Logic for moving a sprite from point (x1,y1) to point (x2,y2)
 - [ ] Logic for rounding a sprite's x-position to the nearest allowed value
@@ -59,19 +35,43 @@ token = Token()
 token.rect.top = 50
 token.rect.right = 50
 
+# mouse state
+mouse_holding_token = False
+mouse_button_down = False
+mouse_token_collide = False
+
 # Game loop
 running = True
 while running:
 		# Handle events
 		for event in pygame.event.get():
+				# set persistent states
+
+				# is token held by user
+				if event.type == MOUSEBUTTONDOWN:
+					mouse_button_down = True
+					mouse_token_collide = token.rect.collidepoint(event.pos)
+					if mouse_token_collide and mouse_button_down:
+							mouse_holding_token = True
+				if event.type == MOUSEMOTION:
+						mouse_token_collide = token.rect.collidepoint(event.pos)
+						if not mouse_token_collide:
+								mouse_holding_token = False
+				elif event.type == MOUSEBUTTONUP:
+					mouse_holding_token = False
+					mouse_button_down = False				
+
+				if mouse_holding_token:
+						if event.type == MOUSEMOTION:
+								token.rect.move_ip(event.rel)
+								# token.rect.right = token.rect.right + 1
+				
+				# other event processing
 				if event.type == pygame.QUIT:
 						running = False
-				elif event.type == MOUSEBUTTONDOWN:	
-					if token.rect.collidepoint(event.pos):
-							print('Mouse Button Down')
-				elif event.type == MOUSEBUTTONUP:	
-					if token.rect.collidepoint(event.pos):
-							print('Mouse Button Up')
+				
+
+
 
 		# Clear the screen
 		screen.fill((0, 0, 0))
