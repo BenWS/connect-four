@@ -5,26 +5,16 @@ from collections import namedtuple
 from pygame.locals import *
 
 class Token(pygame.sprite.Sprite):
-  def __init__(self):
-    self.surf = pygame.Surface((75,75))
+  def __init__(self, position):
+    self.surf = pygame.Surface((position[0],position[1]))
     self.surf.fill((255,0,0))
     self.surf.set_colorkey((255,255,255),RLEACCEL)
     self.rect = self.surf.get_rect()
+
+  @property
+  def centerx(self):
+     return self.rect.centerx
   
-  def find_open_board_cell(self, Board):
-    '''
-    Find and move the token to the available board cell
-    '''
-
-    '''
-    ....PPP
-    get the set of board columns
-    identify and select which of the board columns positions is the closest
-    determine whether any of the board column cells are populated
-    determine whether the token is in correct part of the screen for it to be dropped
-    '''
-    pass
-
 class Board():
   '''
   The Board object is composed of BoardCell objects.
@@ -72,7 +62,13 @@ class Board():
         )
       self.board_cell_group.add(board_cell)
 
-    board_column = Board.BoardColumn(self.board_cell_group,0)		
+    # construct board columns
+    self.board_column_list = [ ] 
+    for num in range(num_columns):
+      board_column = Board.BoardColumn(self.board_cell_group,num)
+      self.board_column_list.append(board_column)
+
+    # print(self.board_column_list)
 
   class BoardCell(pygame.sprite.Sprite):
     def __init__(self, size, position, coordinate):
@@ -80,38 +76,89 @@ class Board():
       self.surf = pygame.Surface((size,size))
       self.rect = self.surf.get_rect()
       self.rect = pygame.draw.rect(self.surf, color=(255,0,0), rect=self.rect, width=2)
+      self.rect.center = position
+      self.center = position
       
-      self.size = size
-      self.coordinate = coordinate
-      self.position = position
-      self.rect.left = position[0]
-      self.rect.top = position[1]
+      self._token = None
+      self._size = size
+      self._coordinate = coordinate
+      self._position = position
+
+    @property
+    def token(self):
+      return self._token
+    
+    @token.setter
+    def token(self, token):
+        self._token = token
+    
+    @property
+    def coordinate(self):
+      return self._coordinate
+
+    @property
+    def position(self):
+      return self._position
+    
+    @property
+    def size(self):
+      return self._size
+  
   
   class BoardColumn():
     '''
     TODO: 2023_07_29_3 - Find Open Board Cell
+
+    - [ ] Board iterates through board columns to find the closest column for token (simply print column index)
+    - [ ] Token iterates through board cells to find the first available board cell 
+    - [ ] Board sets board cell with token
+    - [ ] Game runtime moves token to the destination cell
     '''
     def __init__(self,board_cell_group, column_index):
-      self.member_board_cell_list = [
+      self.board_cell_list = [ ] 
+      self.center = None
+
+      self.board_cell_list = [
         board_cell for board_cell 
         in board_cell_group 
         if board_cell.coordinate[0] == column_index
         ]
       
-      column_center_position = \
-        self.member_board_cell_list[0].position[0] \
-        + self.member_board_cell_list[0].size*1.0/2
-
-      print(column_center_position)
-
-# create token object 
-token = Token()
-token.rect.top = 50
-token.rect.right = 50
-
-# create grid_square objects
-board = Board(board_size=(7,6),board_position=(100,100), cell_width=75)
+      self.center = \
+        self.board_cell_list[0].position[0] \
+        + self.board_cell_list[0].size*1.0/2
+      
     
+
+  def find_board_cell(self,token):
+    '''
+    Find the board cell for which the provided token should populate.
+
+    The 'correct' board cell is determined via a combination of factors:
+      - Closest board cell column to the token
+      - First unpopulated board cell in the board
+    '''
+
+    # token_center_horizontal = token.get_position()[0]
+
+    # get the closest board column for token
+    token_distances = []
+    for board_column in self.board_column_list:
+       token_distance = abs(board_column.center - token.centerx)
+       token_distances.append((token_distance,board_column))
+    
+    closest_column = sorted(token_distances, key=lambda x: x[0])[0][1]
+
+    # get the first unpopulated board cell 
+    board_cell_list = [
+       board_cell 
+       for board_cell in closest_column.board_cell_list 
+       if board_cell.token is None
+       ]
+    target_board_cell = sorted(board_cell_list,key=lambda x: x.coordinate, reverse=True)[0]
+    return target_board_cell
+
+
 def run_game():
   # Initialize Pygame
   pygame.init()
@@ -119,7 +166,13 @@ def run_game():
   # Set up the display
   width, height = 800, 600
   screen = pygame.display.set_mode((width, height))
+  
+  # create token object 
+  token = Token((50,50))
 
+  # create grid_square objects
+  board = Board(board_size=(7,6),board_position=(100,100), cell_width=75)
+      
   # mouse state
   mouse_holding_token = False
   mouse_button_down = False
@@ -143,7 +196,10 @@ def run_game():
                   mouse_holding_token = False
           elif event.type == MOUSEBUTTONUP:
             mouse_holding_token = False
-            mouse_button_down = False				
+            mouse_button_down = False
+            target_board_cell = board.find_board_cell(token)				
+            token.rect.left = target_board_cell.position[0]
+            token.rect.top = target_board_cell.position[1]
 
           if mouse_holding_token:
               if event.type == MOUSEMOTION:
@@ -171,12 +227,12 @@ def run_game():
   pygame.quit()
 
 if __name__ == '__main__':
-  # run_game()
-  # token = Token()
-  # token.rect.top = 50
-  # token.rect.right = 50
+  run_game()
+  # token_position = (50,50)
+  # token = Token(token_position)
   
   # board = Board(board_size=(7,6),board_position=(200,200), cell_width=20)
+  # board.find_board_cell(token)
   # token.find_open_board_cell(board)
   # board.get_board_column_positions()
   pass
