@@ -134,14 +134,6 @@ class Board():
       return self._size
     
   class BoardColumn():
-    '''
-    TODO: 2023_07_29_3 - Find Open Board Cell
-
-    - [ ] Board iterates through board columns to find the closest column for token (simply print column index)
-    - [ ] Token iterates through board cells to find the first available board cell 
-    - [ ] Board sets board cell with token
-    - [ ] Game runtime moves token to the destination cell
-    '''
     def __init__(self,board_cell_group, column_index):
       self.board_cell_list = [ ] 
       self.center = None
