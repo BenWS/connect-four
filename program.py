@@ -77,7 +77,7 @@ class Board():
       self.rect = self.surf.get_rect()
       self.rect = pygame.draw.rect(self.surf, color=(255,0,0), rect=self.rect, width=2)
       self.rect.center = position
-      self.center = position
+      self.position = position
       
       self._token = None
       self._size = size
@@ -95,10 +95,6 @@ class Board():
     @property
     def coordinate(self):
       return self._coordinate
-
-    @property
-    def position(self):
-      return self._position
     
     @property
     def size(self):
