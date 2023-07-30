@@ -385,4 +385,3 @@ def run_game():
 
 if __name__ == '__main__':
   run_game()
-  # board = Board(board_size=(7,6),board_position=(100,100), cell_width=75)git 
